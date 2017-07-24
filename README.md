@@ -182,6 +182,27 @@ Finally, implement the relevant UIApplication delegate.
 }
 ```
 
+```swift
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        guard let sourceApplication = options[.sourceApplication] as? String,
+            let window = window,
+            let rootViewController = window.rootViewController,
+            sourceApplication.hasPrefix("com.squareup.square") else {
+                return false
+        }
+
+        do {
+            let response = try SCCAPIResponse(responseURL: url)
+            ...
+        } catch let error as NSError {
+            ...
+        }
+
+        return true
+    }
+}
+```
+
 ## Contributing
 We’re glad you’re interested in Square Point of Sale SDK, and we’d love to see where you take it. Please read our [contributing guidelines](Contributing.md) prior to submitting a Pull Request.
 
