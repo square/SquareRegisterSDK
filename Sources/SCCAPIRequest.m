@@ -21,6 +21,8 @@
 #import "SCCAPIRequest.h"
 #import "SCCAPIRequest+Serialization.h"
 
+#import "SCAPIURLConversion.h"
+
 #import "NSDictionary+SCCAdditions.h"
 #import "NSError+SCCAdditions.h"
 #import "SCCMoney.h"
@@ -42,13 +44,14 @@ NSString *__nonnull const SCCAPIRequestOptionsKey = @"options";
 NSString *__nonnull const SCCAPIRequestOptionsSupportedTenderTypesKey = @"supported_tender_types";
 NSString *__nonnull const SCCAPIRequestOptionsClearDefaultFeesKey = @"clear_default_fees";
 NSString *__nonnull const SCCAPIRequestOptionsAutoReturnKey = @"auto_return";
+NSString *__nonnull const SCCAPIRequestOptionsDisableCNPKey = @"disable_cnp";
+NSString *__nonnull const SCCAPIRequestOptionsSkipReceiptKey = @"skip_receipt";
 NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringCard = @"CREDIT_CARD";
 NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringCash = @"CASH";
 NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringOther = @"OTHER";
 NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringSquareGiftCard = @"SQUARE_GIFT_CARD";
 NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringCardOnFile = @"CARD_ON_FILE";
 NSString *__nonnull const SCCAPIRequestLocationIDKey = @"location_id";
-
 
 @implementation SCCAPIRequest
 
@@ -153,7 +156,7 @@ static NSString *__nullable APIClientID = nil;
     }
 
     _clientID = [clientID copy];
-    _callbackURL = callbackURL;
+    _callbackURL = [callbackURL copy];
     _amount = [amount copy];
     _userInfoString = [userInfoString copy];
     _locationID = [locationID copy];
@@ -185,7 +188,7 @@ static NSString *__nullable APIClientID = nil;
 {
     NSUInteger const hashOfRequiredFields = self.clientID.hash ^ self.callbackURL.hash ^ self.amount.hash;
     NSUInteger const hashOfOptionalFields = self.userInfoString.hash ^ self.locationID.hash ^ self.notes.hash ^ self.customerID.hash;
-    NSUInteger const hashOfScalarFields = (NSUInteger)self.supportedTenderTypes ^ (NSUInteger)self.clearsDefaultFees ^ (NSUInteger)self.returnsAutomaticallyAfterPayment;
+    NSUInteger const hashOfScalarFields = (NSUInteger)self.supportedTenderTypes ^ (NSUInteger)self.clearsDefaultFees ^ (NSUInteger)self.returnsAutomaticallyAfterPayment ^ (NSUInteger)self.disablesKeyedInCardEntry ^ (NSUInteger)self.skipsReceipt;
 
     return hashOfRequiredFields ^ hashOfOptionalFields ^ hashOfScalarFields;
 }
@@ -232,7 +235,9 @@ static NSString *__nullable APIClientID = nil;
     // The following properties are scalar.
     if (!(self.supportedTenderTypes == request.supportedTenderTypes) ||
         !(self.clearsDefaultFees == request.clearsDefaultFees) ||
-        !(self.returnsAutomaticallyAfterPayment == request.returnsAutomaticallyAfterPayment)) {
+        !(self.returnsAutomaticallyAfterPayment == request.returnsAutomaticallyAfterPayment) ||
+        !(self.disablesKeyedInCardEntry == request.disablesKeyedInCardEntry) ||
+        !(self.skipsReceipt == request.skipsReceipt)) {
         return NO;
     }
 
@@ -262,7 +267,7 @@ static NSString *__nullable APIClientID = nil;
     [data setObject:self.clientID forKey:SCCAPIRequestClientIDKey];
 
     [data SCC_setSafeObject:self.amount.requestDictionaryRepresentation forKey:SCCAPIRequestAmountMoneyKey];
-    [data SCC_setSafeObject:self.callbackURL.absoluteString forKey:SCCAPIRequestCallbackURLKey];
+    [data SCC_setSafeObject:[SCAPIURLConversion encode:self.callbackURL].absoluteString forKey:SCCAPIRequestCallbackURLKey];
     [data SCC_setSafeObject:self.userInfoString forKey:SCCAPIRequestStateKey];
     [data SCC_setSafeObject:self.locationID forKey:SCCAPIRequestLocationIDKey];
     [data SCC_setSafeObject:self.notes forKey:SCCAPIRequestNotesKey];
@@ -273,6 +278,8 @@ static NSString *__nullable APIClientID = nil;
     [options SCC_setSafeObject:supportedTenderTypes forKey:SCCAPIRequestOptionsSupportedTenderTypesKey];
     [options SCC_setSafeObject:@(self.clearsDefaultFees) forKey:SCCAPIRequestOptionsClearDefaultFeesKey];
     [options SCC_setSafeObject:@(self.returnsAutomaticallyAfterPayment) forKey:SCCAPIRequestOptionsAutoReturnKey];
+    [options SCC_setSafeObject:@(self.disablesKeyedInCardEntry) forKey:SCCAPIRequestOptionsDisableCNPKey];
+    [options SCC_setSafeObject:@(self.skipsReceipt) forKey:SCCAPIRequestOptionsSkipReceiptKey];
     if (options.count) {
         [data SCC_setSafeObject:options forKey:SCCAPIRequestOptionsKey];
     }

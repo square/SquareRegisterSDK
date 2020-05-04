@@ -1,21 +1,42 @@
 Pod::Spec.new do |s|
   s.name         = 'SquarePointOfSaleSDK'
-  s.version      = '3.3.1'
+  s.version      = '3.4.0'
   s.summary      = 'SDK for easier use of Square\'s Point of Sale app-switching API on iOS'
   s.homepage     = 'https://github.com/square/SquarePointOfSaleSDK-iOS/'
   s.license      = { :type => 'Apache License, Version 2.0', :text => "© #{ Date.today.year } Square, Inc." }
   s.authors      = 'Square'
   s.source       = { :git => 'https://github.com/square/SquarePointOfSaleSDK-iOS.git', :tag => s.version }
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
 
   s.source_files = 'Sources/**/*.{h,m}'
 
-  s.private_header_files = 'Sources/Categories/NSDictionary+SCCAdditions.h'
+  s.private_header_files = %w[
+    Sources/Categories/NSDictionary+SCCAdditions.h
+  ]
 
   s.test_spec 'Tests' do |test_spec|
   	test_spec.source_files = 'Tests/**/*.{h,m}'
   	test_spec.dependency 'OCMock', '= 3.1'
+  end
+
+  s.app_spec 'SampleApp' do |app_spec|
+    app_spec.source_files = 'SampleApp/Sources/**/*.{h,m,swift}'
+
+    app_spec.info_plist = {
+      'CFBundleURLTypes' => [
+        {
+          CFBundleURLTypes: 'Editor', 
+          CFBundleURLName: 'Square POS Api Return Location',
+          CFBundleURLSchemes: [
+            'square-pos-api-sample'
+          ]
+        }
+      ],
+      'LSApplicationQueriesSchemes' => [
+        'square-commerce-v1'
+      ]
+    }
   end
 
   s.pod_target_xcconfig = {
@@ -149,5 +170,4 @@ Pod::Spec.new do |s|
 	  # Warn about declaring the same method more than once within the same @interface.
 	  'CLANG_WARN__DUPLICATE_METHOD_MATCH' => 'YES',
 	}
-
 end

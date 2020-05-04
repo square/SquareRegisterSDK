@@ -83,7 +83,7 @@ Get your `Application ID` from the `Credentials` tab.
 
 ```swift
 // Replace with your app's URL scheme.
-let callbackURL = URL(string: <#T##Your URL Scheme##String#>)!
+let callbackURL = URL(string: "<#T##Your URL Scheme##String#>://")!
 
 // Your client ID is the same as your Square Application ID.
 // Note: You only need to set your client ID once, before creating your first request.
@@ -119,9 +119,8 @@ Finally, implement the UIApplication delegate method as follows:
 
 ```swift
 func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-    guard let sourceApplication = options[.sourceApplication] as? String,
-        sourceApplication.hasPrefix("com.squareup.square") else {
-        return false
+    guard SCCAPIResponse.isSquareResponse(url) else {
+        return
     }
 
     do {
@@ -150,7 +149,7 @@ func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpe
 
 ```objc
 // Replace with your app's callback URL.
-NSURL *const callbackURL = [NSURL URLWithString:<#Your URL Scheme#>];
+NSURL *const callbackURL = [NSURL URLWithString:@"<#Your URL Scheme#>://"];
 
 // Specify the amount of money to charge.
 SCCMoney *const amount = [SCCMoney moneyWithAmountCents:100 currencyCode:@"USD" error:NULL];
@@ -182,8 +181,7 @@ Finally, implement the relevant UIApplication delegate.
 ```objc
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)URL options:(NSDictionary<NSString *,id> *)options;
 {
-    NSString *const sourceApplication = options[UIApplicationOpenURLOptionsSourceApplicationKey];
-    if ([sourceApplication hasPrefix:@"com.squareup.square"]) {
+    if ([SCCAPIResponse isSquareResponse:url]) {
         SCCAPIResponse *const response = [SCCAPIResponse responseWithResponseURL:URL error:&decodeError];
         ...
         return YES;
@@ -194,6 +192,25 @@ Finally, implement the relevant UIApplication delegate.
 
 ## Contributing
 We’re glad you’re interested in Square Point of Sale SDK, and we’d love to see where you take it. Please read our [contributing guidelines](Contributing.md) prior to submitting a Pull Request.
+
+## Releasing
+
+First create a new tag:
+```
+git tag XYZ
+```
+
+Push the tag to Github
+```
+git push --tags
+```
+
+Generate a new release on Github.com and upload an archive of the binary using:
+
+```
+bundle exec pod gen && carthage build --no-skip-current --platform ios && carthage archive SquarePointOfSaleSDK
+```
+
 
 ## Support
 If you are having trouble with using this SDK in your project, please create a question on [Stack Overflow](https://stackoverflow.com/questions/tagged/square-connect) with the `square-connect` tag. Our team monitors that tag and will be able to help you. If you think there is something wrong with the SDK itself, please create an issue.

@@ -9,8 +9,6 @@ build/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-*.xcworkspace
-!default.xcworkspace
 xcuserdata
 profile
 *.moved-aside
@@ -28,3 +26,6 @@ Carthage/Build
 # ios-builder
 .bin
 .bundle
+
+# cocoapods-gen working folder
+gen
