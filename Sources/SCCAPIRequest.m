@@ -92,6 +92,8 @@ static NSString *__nullable APIClientID = nil;
                            supportedTenderTypes:(SCCAPIRequestTenderTypes)supportedTenderTypes
                               clearsDefaultFees:(BOOL)clearsDefaultFees
                returnsAutomaticallyAfterPayment:(BOOL)autoreturn
+                       disablesKeyedInCardEntry:(BOOL)disablesKeyedInCardEntry
+                                   skipsReceipt:(BOOL)skipsReceipt
                                           error:(out NSError *__nullable *__nullable)error;
 {
     if (![self.class _applicationID].length) {
@@ -124,7 +126,9 @@ static NSString *__nullable APIClientID = nil;
                                     customerID:customerID
                           supportedTenderTypes:supportedTenderTypes
                              clearsDefaultFees:clearsDefaultFees
-               returnAutomaticallyAfterPayment:autoreturn];
+               returnAutomaticallyAfterPayment:autoreturn
+                      disablesKeyedInCardEntry:disablesKeyedInCardEntry
+                                  skipsReceipt:skipsReceipt];
 }
 
 - (instancetype)initWithApplicationID:(nonnull NSString *)applicationID
@@ -136,7 +140,9 @@ static NSString *__nullable APIClientID = nil;
                            customerID:(nullable NSString *)customerID
                  supportedTenderTypes:(SCCAPIRequestTenderTypes)supportedTenderTypes
                     clearsDefaultFees:(BOOL)clearsDefaultFees
-      returnAutomaticallyAfterPayment:(BOOL)autoreturn;
+      returnAutomaticallyAfterPayment:(BOOL)autoreturn
+             disablesKeyedInCardEntry:(BOOL)disablesKeyedInCardEntry
+                         skipsReceipt:(BOOL)skipsReceipt
 {
     NSAssert(callbackURL.scheme.length, @"Callback URL must be specified and have a scheme.");
     NSAssert(amount && amount.amountCents >= 0, @"SCCMoney amount must be specified.");
@@ -152,10 +158,12 @@ static NSString *__nullable APIClientID = nil;
     _userInfoString = [userInfoString copy];
     _locationID = [locationID copy];
     _notes = [notes copy];
+    _customerID = [customerID copy];
     _supportedTenderTypes = supportedTenderTypes;
     _clearsDefaultFees = clearsDefaultFees;
     _returnsAutomaticallyAfterPayment = autoreturn;
-    _customerID = [customerID copy];
+    _disablesKeyedInCardEntry = disablesKeyedInCardEntry;
+    _skipsReceipt = skipsReceipt;
 
     return self;
 }

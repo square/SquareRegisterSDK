@@ -55,7 +55,7 @@ typedef NS_OPTIONS(NSUInteger, SCCAPIRequestTenderTypes) {
  The client ID must be set to something other than nil before the first API request object is created.
  @param clientID The client ID to associate with all subsequent API requests.
  */
-+ (void)setClientID:(nullable NSString *)clientID;
++ (void)setClientID:(nullable NSString *)clientID __deprecated_msg("Use the favored `setApplicationID` instead.");
 
 /**
  Sets application client ID to associate with all subsequent API requests.
@@ -93,6 +93,8 @@ typedef NS_OPTIONS(NSUInteger, SCCAPIRequestTenderTypes) {
                            supportedTenderTypes:(SCCAPIRequestTenderTypes)supportedTenderTypes
                               clearsDefaultFees:(BOOL)clearsDefaultFees
                returnsAutomaticallyAfterPayment:(BOOL)autoreturn
+                       disablesKeyedInCardEntry:(BOOL)disablesKeyedInCardEntry
+                                   skipsReceipt:(BOOL)skipsReceipt
                                           error:(out NSError *__nullable *__nullable)error;
 
 /// Application Client ID bound to the request at the time of creation. Same as applicationID
@@ -134,11 +136,11 @@ typedef NS_OPTIONS(NSUInteger, SCCAPIRequestTenderTypes) {
 
 /// If YES, Point of Sale will not display the option to manually key-in a credit card number.
 /// Defaults to NO.
-@property (nonatomic, assign) BOOL disablesKeyedInCardEntry;
+@property (nonatomic, assign, readonly) BOOL disablesKeyedInCardEntry;
 
 /// If YES, Point of Sale will skip the receipt screen of the payment flow for non-cash payments.
 /// Defaults to NO.
-@property (nonatomic, assign) BOOL skipsReceipt;
+@property (nonatomic, assign, readonly) BOOL skipsReceipt;
 
 /**
  @param request The request to compare the receiver to.
